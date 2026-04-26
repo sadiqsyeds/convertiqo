@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("pdf-converter")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/pdf-converter` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/pdf-converter`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("pdf-converter");
 
 const faqs = [
   { q: "What can I convert a PDF to?", a: "You can convert PDF pages to JPG or PNG images, or to Word DOCX (text extraction). Multi-page PDFs are downloaded as a ZIP archive." },

@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("image-converter")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/image-converter` },
-  openGraph: {
-    title: page.title,
-    description: page.description,
-    url: `${SITE_URL}/image-converter`,
-    type: "website",
-  },
-};
+export const metadata: Metadata = buildToolMetadata("image-converter");
 
 const faqs = [
   {

@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("compress-image")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/compress-image` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/compress-image`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("compress-image");
 
 const faqs = [
   { q: "How do I compress an image without losing quality?", a: "Set the quality slider to 80–85%. At this level, most images look identical to the original but are 40–60% smaller. WebP format gives the best size reduction." },

@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("jpg-to-png")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/jpg-to-png` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/jpg-to-png`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("jpg-to-png");
 
 const faqs = [
   { q: "Why convert JPG to PNG?", a: "PNG is a lossless format that supports transparency. Convert JPG to PNG when you need to add a transparent background, prevent further quality loss from re-saves, or edit the image multiple times." },

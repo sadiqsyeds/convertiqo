@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("pdf-to-word")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/pdf-to-word` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/pdf-to-word`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("pdf-to-word");
 
 const faqs = [
   { q: "How does PDF to Word conversion work?", a: "PDF.js extracts the selectable text from each page. The text is then structured into paragraphs and assembled into a DOCX file using the docx library. All processing happens in your browser." },

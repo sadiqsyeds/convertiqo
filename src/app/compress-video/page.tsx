@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("compress-video")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/compress-video` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/compress-video`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("compress-video");
 
 const faqs = [
   { q: "How does video compression work in the browser?", a: "Convertino re-encodes the video through your browser's MediaRecorder API. The quality slider controls the video bitrate — lower quality means lower bitrate and smaller file size." },

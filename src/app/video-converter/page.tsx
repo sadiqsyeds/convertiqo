@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("video-converter")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/video-converter` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/video-converter`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("video-converter");
 
 const faqs = [
   { q: "What video formats does Convertino support?", a: "Input: MP4, WebM, MOV, MKV, AVI. Output: MP4, WebM, MOV, AVI, MKV, GIF, and MP3 (audio extraction)." },

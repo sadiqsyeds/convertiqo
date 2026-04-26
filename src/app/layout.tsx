@@ -9,6 +9,8 @@ import {
   SITE_NAME,
   SITE_DESCRIPTION,
   SITE_TAGLINE,
+  OG_WIDTH,
+  OG_HEIGHT,
   GA_MEASUREMENT_ID,
   GSC_VERIFICATION,
 } from "@/lib/seo";
@@ -25,10 +27,13 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const OG_TITLE = `${SITE_NAME} – ${SITE_TAGLINE}`;
+const OG_IMAGE_URL = `${SITE_URL}/opengraph-image`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} – ${SITE_TAGLINE}`,
+    default: OG_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -65,23 +70,25 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} – ${SITE_TAGLINE}`,
+    title: OG_TITLE,
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: `${SITE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} – Free Online File Converter`,
+        url: OG_IMAGE_URL,
+        width: OG_WIDTH,
+        height: OG_HEIGHT,
+        alt: OG_TITLE,
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} – ${SITE_TAGLINE}`,
+    title: OG_TITLE,
     description: SITE_DESCRIPTION,
-    images: [`${SITE_URL}/og-image.png`],
+    images: [OG_IMAGE_URL],
     creator: "@convertino",
+    site: "@convertino",
   },
   alternates: {
     canonical: SITE_URL,

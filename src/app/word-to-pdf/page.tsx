@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("word-to-pdf")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/word-to-pdf` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/word-to-pdf`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("word-to-pdf");
 
 const faqs = [
   { q: "How does Word to PDF conversion work in the browser?", a: "Convertino uses the Mammoth library to parse DOCX XML into HTML, then renders it with html2canvas and encodes it as a PDF using jsPDF. Everything happens locally." },

@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { getToolPage, SITE_URL } from "@/lib/seo";
+import { getToolPage, buildToolMetadata } from "@/lib/seo";
 import { ToolPageLayout } from "@/components/seo/tool-page-layout";
 
 const page = getToolPage("png-to-webp")!;
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-  keywords: page.keywords,
-  alternates: { canonical: `${SITE_URL}/png-to-webp` },
-  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/png-to-webp`, type: "website" },
-};
+export const metadata: Metadata = buildToolMetadata("png-to-webp");
 
 const faqs = [
   { q: "Why should I convert PNG to WebP?", a: "WebP images are typically 25–34% smaller than PNG at equivalent quality. Smaller images mean faster page load times and better Core Web Vitals scores." },
