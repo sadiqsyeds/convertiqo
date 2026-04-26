@@ -70,6 +70,7 @@ export default function HomePage() {
   const selectionCount = mounted ? selectedIds.size : 0;
   const allSelected = selectionCount === activeQueue.length && activeQueue.length > 0;
   const hasSelection = selectionCount > 0;
+  const hasMultiSelection = selectionCount > 1;
 
   // Collect formats available across all selected items
   const selectedItems = activeQueue.filter((q) => selectedIds.has(q.id));
@@ -132,7 +133,7 @@ export default function HomePage() {
                 </span>
               </button>
 
-              {hasSelection && (
+              {hasMultiSelection && (
                 <>
                   <div className="h-4 w-px bg-border shrink-0" />
                   {/* Bulk format chips */}
@@ -238,8 +239,8 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Row 2: bulk quality slider (only when selection and quality open) */}
-            {hasSelection && showBulkQuality && (
+            {/* Row 2: bulk quality slider (only when multi-selection and quality open) */}
+            {hasMultiSelection && showBulkQuality && (
               <div className="flex items-center gap-3 pt-2 border-t border-border">
                 <span className="text-xs text-muted-foreground shrink-0 w-28">
                   Bulk quality ({selectionCount} files)
