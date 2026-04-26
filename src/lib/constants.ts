@@ -130,7 +130,11 @@ export const IMAGE_OUTPUT_FORMATS: FormatOption[] = [
 export const VIDEO_OUTPUT_FORMATS: FormatOption[] = [
   { format: "mp4", label: "MP4", description: "Universal compatibility" },
   { format: "webm", label: "WebM", description: "Web-optimized" },
+  { format: "mov", label: "MOV", description: "Apple QuickTime" },
+  { format: "avi", label: "AVI", description: "Windows video format" },
+  { format: "mkv", label: "MKV", description: "Matroska container" },
   { format: "gif", label: "GIF", description: "Animated (short clips)" },
+  { format: "mp3", label: "MP3", description: "Extract audio only" },
 ];
 
 export const PDF_OUTPUT_FORMATS: FormatOption[] = [
@@ -200,6 +204,7 @@ export const FORMAT_COLORS: Record<string, string> = {
   mov: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
   mkv: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
   avi: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+  mp3: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
   pdf: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   docx: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
   doc: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",

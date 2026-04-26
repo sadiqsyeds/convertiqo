@@ -63,6 +63,7 @@ interface FileStoreState {
   history: HistoryEntry[];
   isConverting: boolean;
   abortControllers: Map<string, AbortController>;
+  selectedIds: Set<string>;
 
   // Queue actions
   addFiles: (files: File[]) => void;
@@ -70,6 +71,14 @@ interface FileStoreState {
   clearQueue: () => void;
   clearDone: () => void;
   reorderQueue: (from: number, to: number) => void;
+
+  // Selection
+  toggleSelect: (id: string) => void;
+  selectAll: () => void;
+  clearSelection: () => void;
+  bulkUpdateFormat: (format: ConversionFormat) => void;
+  bulkUpdateSettings: (partial: Record<string, unknown>) => void;
+  bulkRemove: () => void;
 
   // Per-item settings
   updateOutputFormat: (id: string, format: ConversionFormat) => void;
@@ -102,6 +111,7 @@ export const useFileStore = create<FileStoreState>()(
       history: [],
       isConverting: false,
       abortControllers: new Map(),
+      selectedIds: new Set<string>(),
 
       // ─── Add Files ───────────────────────────────────────────────────────────
 
@@ -317,6 +327,69 @@ export const useFileStore = create<FileStoreState>()(
       },
 
       clearHistory: () => set({ history: [] }),
+
+      // ─── Selection ────────────────────────────────────────────────────────────
+
+      toggleSelect: (id: string) => {
+        set((state) => {
+          const next = new Set(state.selectedIds);
+          if (next.has(id)) next.delete(id);
+          else next.add(id);
+          return { selectedIds: next };
+        });
+      },
+
+      selectAll: () => {
+        const ids = get().queue.map((q) => q.id);
+        set({ selectedIds: new Set(ids) });
+      },
+
+      clearSelection: () => set({ selectedIds: new Set<string>() }),
+
+      bulkUpdateFormat: (format: ConversionFormat) => {
+        const { selectedIds } = get();
+        set((state) => ({
+          queue: state.queue.map((item) => {
+            if (!selectedIds.has(item.id)) return item;
+            // Only update if the format is available for this item's category
+            const isAvailable = item.availableFormats.some((f) => f.format === format);
+            if (!isAvailable) return item;
+            const newSettings = buildDefaultSettings(item.category, format);
+            return {
+              ...item,
+              outputFormat: format,
+              settings: { ...newSettings, outputFormat: format as never },
+              status: "idle",
+              progress: 0,
+              result: undefined,
+              error: undefined,
+            };
+          }),
+        }));
+      },
+
+      bulkUpdateSettings: (partial: Record<string, unknown>) => {
+        const { selectedIds } = get();
+        set((state) => ({
+          queue: state.queue.map((item) =>
+            selectedIds.has(item.id)
+              ? { ...item, settings: { ...item.settings, ...partial } as ConversionSettings }
+              : item
+          ),
+        }));
+      },
+
+      bulkRemove: () => {
+        const { selectedIds, queue } = get();
+        queue.forEach((item) => {
+          if (!selectedIds.has(item.id)) return;
+          if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+        });
+        set((state) => ({
+          queue: state.queue.filter((item) => !selectedIds.has(item.id)),
+          selectedIds: new Set<string>(),
+        }));
+      },
 
       // ─── Batch ───────────────────────────────────────────────────────────────
 

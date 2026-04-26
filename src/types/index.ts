@@ -15,7 +15,7 @@ export type ImageFormat =
   | "tiff"
   | "svg";
 
-export type VideoFormat = "mp4" | "webm" | "mov" | "mkv" | "avi" | "gif";
+export type VideoFormat = "mp4" | "webm" | "mov" | "mkv" | "avi" | "gif" | "mp3";
 
 export type DocumentFormat = "pdf" | "docx" | "doc" | "png" | "jpg";
 

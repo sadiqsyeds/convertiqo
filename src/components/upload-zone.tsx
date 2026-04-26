@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, CloudUpload, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   ALL_ACCEPTED_TYPES,
   MAX_FILE_SIZE_BYTES,
@@ -22,8 +21,6 @@ interface UploadZoneProps {
 export function UploadZone({ className, compact = false }: UploadZoneProps) {
   const addFiles = useFileStore((s) => s.addFiles);
   const queueLength = useFileStore((s) => s.queue.length);
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const handleFiles = useCallback(
     (files: File[]) => {
       if (queueLength >= MAX_FILES_IN_QUEUE) {
@@ -89,7 +86,6 @@ export function UploadZone({ className, compact = false }: UploadZoneProps) {
       },
       maxSize: MAX_FILE_SIZE_BYTES,
       multiple: true,
-      noClick: true, // We handle click via button
     });
 
   if (compact) {
@@ -97,26 +93,19 @@ export function UploadZone({ className, compact = false }: UploadZoneProps) {
       <div
         {...getRootProps()}
         className={cn(
-          "flex items-center gap-3 rounded-xl border-2 border-dashed border-border px-4 py-3 transition-all duration-200",
+          "flex items-center gap-3 rounded-xl border-2 border-dashed border-border px-4 py-3 transition-all duration-200 cursor-pointer",
+          "hover:border-primary/50 hover:bg-muted/50",
           isDragActive && !isDragReject && "border-primary bg-primary/5",
           isDragReject && "border-destructive bg-destructive/5",
           className
         )}
       >
-        <input {...getInputProps()} ref={inputRef} />
+        <input {...getInputProps()} />
         <CloudUpload className="h-5 w-5 shrink-0 text-muted-foreground" />
         <span className="flex-1 text-sm text-muted-foreground">
-          {isDragActive ? "Drop files here…" : "Drop more files or"}
+          {isDragActive ? "Drop files here…" : "Click or drop files to add more"}
         </span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => inputRef.current?.click()}
-          type="button"
-        >
-          <FolderOpen className="h-3.5 w-3.5" />
-          Browse
-        </Button>
+        <FolderOpen className="h-4 w-4 text-muted-foreground" />
       </div>
     );
   }
@@ -125,14 +114,14 @@ export function UploadZone({ className, compact = false }: UploadZoneProps) {
     <div
       {...getRootProps()}
       className={cn(
-        "group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 px-6 py-12 text-center transition-all duration-200 cursor-default",
+        "group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 px-6 py-12 text-center transition-all duration-200 cursor-pointer",
         "hover:border-primary/50 hover:bg-muted/50",
         isDragActive && !isDragReject && "border-primary bg-primary/5 scale-[1.01]",
         isDragReject && "border-destructive bg-destructive/5",
         className
       )}
     >
-      <input {...getInputProps()} ref={inputRef} />
+      <input {...getInputProps()} />
 
       {/* Icon */}
       <div
@@ -163,32 +152,15 @@ export function UploadZone({ className, compact = false }: UploadZoneProps) {
       ) : (
         <>
           <p className="text-base font-semibold text-foreground mb-1">
-            Drag & drop files here
+            Click or drag & drop files here
           </p>
-          <p className="text-sm text-muted-foreground mb-5">
+          <p className="text-sm text-muted-foreground">
             Images, Videos, PDFs, Word documents — up to {MAX_FILE_SIZE_MB} MB each
           </p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            JPG · PNG · WebP · AVIF · GIF · SVG · BMP · TIFF · MP4 · WebM · MOV · PDF · DOCX
+          </p>
         </>
-      )}
-
-      {/* Click-to-upload */}
-      {!isDragActive && (
-        <Button
-          onClick={() => inputRef.current?.click()}
-          type="button"
-          variant="outline"
-          className="gap-2"
-        >
-          <FolderOpen className="h-4 w-4" />
-          Choose files
-        </Button>
-      )}
-
-      {/* Supported formats hint */}
-      {!isDragActive && (
-        <p className="mt-4 text-xs text-muted-foreground">
-          JPG · PNG · WebP · AVIF · GIF · SVG · BMP · TIFF · MP4 · WebM · MOV · PDF · DOCX
-        </p>
       )}
     </div>
   );

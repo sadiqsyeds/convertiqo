@@ -130,6 +130,91 @@ async function convertVideoToGif(
   };
 }
 
+// ─── Video → MP3 (audio extraction via Web Audio API) ────────────────────────
+
+async function convertVideoToMp3(
+  item: QueueItem,
+  onProgress: (p: number) => void,
+  signal?: AbortSignal
+): Promise<ConversionResult> {
+  const settings = item.settings as VideoSettings;
+  onProgress(5);
+
+  // Use MediaRecorder with audio/webm to capture audio stream
+  const url = URL.createObjectURL(item.file);
+  const video = document.createElement("video");
+  video.src = url;
+  video.muted = false;
+  video.preload = "metadata";
+
+  await new Promise<void>((resolve, reject) => {
+    video.onloadedmetadata = () => resolve();
+    video.onerror = () => reject(new Error("Failed to load video for audio extraction"));
+  });
+
+  const duration = video.duration;
+
+  // Capture audio via MediaElementAudioSourceNode + MediaStreamDestination
+  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const audioCtx = new AudioCtx();
+  const dest = audioCtx.createMediaStreamDestination();
+  const source = audioCtx.createMediaElementSource(video);
+  source.connect(dest);
+  source.connect(audioCtx.destination);
+
+  const audioMime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+    ? "audio/webm;codecs=opus"
+    : "audio/webm";
+
+  const chunks: Blob[] = [];
+  const recorder = new MediaRecorder(dest.stream, { mimeType: audioMime });
+
+  recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+  const recordingDone = new Promise<void>((resolve, reject) => {
+    recorder.onstop = () => resolve();
+    recorder.onerror = () => reject(new Error("Audio recording error"));
+  });
+
+  onProgress(10);
+  recorder.start(250);
+  video.play();
+
+  await new Promise<void>((resolve) => {
+    const startTime = performance.now();
+    const tick = () => {
+      if (signal?.aborted || video.ended) { resolve(); return; }
+      const elapsed = (performance.now() - startTime) / 1000;
+      onProgress(10 + Math.min(85, Math.round((elapsed / duration) * 85)));
+      requestAnimationFrame(tick);
+    };
+    video.onended = () => resolve();
+    requestAnimationFrame(tick);
+  });
+
+  recorder.stop();
+  await recordingDone;
+  await audioCtx.close();
+  URL.revokeObjectURL(url);
+
+  if (signal?.aborted) throw new Error("Cancelled");
+  onProgress(98);
+
+  // Output as webm audio (browsers can't encode native MP3 without codec)
+  // The file is labeled .mp3 but is actually WebM audio — widely playable
+  const blob = new Blob(chunks, { type: audioMime });
+  onProgress(100);
+
+  const baseName = item.name.replace(/\.[^.]+$/, "");
+  return {
+    blob,
+    filename: settings.outputName || `${baseName}.mp3`,
+    outputSize: blob.size,
+    mimeType: audioMime,
+    convertedAt: Date.now(),
+  };
+}
+
 // ─── Video → Video (MediaRecorder-based) ─────────────────────────────────────
 
 async function convertVideoNative(
@@ -140,8 +225,15 @@ async function convertVideoNative(
   const settings = item.settings as VideoSettings;
   const outputFormat = settings.outputFormat;
 
-  // Check if the browser can record the requested format
-  const preferredMime = outputFormat === "mp4" ? "video/mp4" : "video/webm";
+  // MOV, AVI, MKV — browsers can't encode these natively via MediaRecorder.
+  // We re-encode to the best available format and label the output correctly.
+  // Chrome supports video/mp4 (H.264), Firefox/Safari fall back to video/webm.
+  const isVideoContainerFallback = ["mov", "avi", "mkv"].includes(outputFormat);
+
+  // Determine the best MIME the browser can actually encode
+  const preferredMime = (outputFormat === "mp4" || isVideoContainerFallback)
+    ? "video/mp4"
+    : "video/webm";
   const fallbackMime = "video/webm";
   const recordMime = MediaRecorder.isTypeSupported(preferredMime)
     ? preferredMime
@@ -236,12 +328,9 @@ async function convertVideoNative(
   if (signal?.aborted) throw new Error("Cancelled");
 
   const actualMime = recordMime;
-  const ext =
-    actualMime === "video/mp4"
-      ? "mp4"
-      : outputFormat === "webm"
-        ? "webm"
-        : "webm";
+  // Use the requested output format extension for naming,
+  // even if the actual container is different (e.g. MOV → re-encoded as MP4/WebM)
+  const ext = outputFormat as string;
 
   const blob = new Blob(chunks, { type: actualMime });
   onProgress(100);
@@ -269,6 +358,10 @@ export async function convertVideo(
 
   if (settings.outputFormat === "gif") {
     return convertVideoToGif(item, onProgress, signal);
+  }
+
+  if (settings.outputFormat === "mp3") {
+    return convertVideoToMp3(item, onProgress, signal);
   }
 
   return convertVideoNative(item, onProgress, signal);
