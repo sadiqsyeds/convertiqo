@@ -117,21 +117,23 @@ export default function HomePage() {
           <div className="rounded-xl border border-border bg-card px-4 py-3 mb-4 space-y-3">
             {/* Row 1: selection + file count + actions */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* Select all toggle */}
-              <button
-                onClick={allSelected ? clearSelection : selectAll}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                title={allSelected ? "Deselect all" : "Select all"}
-              >
-                {allSelected ? (
-                  <CheckSquare className="h-3.5 w-3.5 text-primary" />
-                ) : (
-                  <Square className="h-3.5 w-3.5" />
-                )}
-                <span>
-                  {hasSelection ? `${selectionCount} selected` : "Select all"}
-                </span>
-              </button>
+              {/* Select all toggle — only shown when there are 2+ files */}
+              {activeQueue.length > 1 && (
+                <button
+                  onClick={allSelected ? clearSelection : selectAll}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                  title={allSelected ? "Deselect all" : "Select all"}
+                >
+                  {allSelected ? (
+                    <CheckSquare className="h-3.5 w-3.5 text-primary" />
+                  ) : (
+                    <Square className="h-3.5 w-3.5" />
+                  )}
+                  <span>
+                    {hasSelection ? `${selectionCount} selected` : "Select all"}
+                  </span>
+                </button>
+              )}
 
               {hasMultiSelection && (
                 <>
@@ -281,11 +283,64 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-4 px-6 text-center text-xs text-muted-foreground">
-        <p>
-          Convertiqo — All conversions happen in your browser. No files are
-          uploaded to any server.
-        </p>
+      <footer className="border-t border-border py-8 px-6 bg-muted/10">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
+            <div>
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">Images</p>
+              <ul className="space-y-2">
+                {[
+                  ["Image Converter", "/image-converter"],
+                  ["JPG to PNG", "/jpg-to-png"],
+                  ["PNG to WebP", "/png-to-webp"],
+                  ["Compress Image", "/compress-image"],
+                ].map(([label, href]) => (
+                  <li key={href}>
+                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">Videos</p>
+              <ul className="space-y-2">
+                {[
+                  ["Video Converter", "/video-converter"],
+                  ["Compress Video", "/compress-video"],
+                ].map(([label, href]) => (
+                  <li key={href}>
+                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">PDF & Docs</p>
+              <ul className="space-y-2">
+                {[
+                  ["PDF Converter", "/pdf-converter"],
+                  ["PDF to Word", "/pdf-to-word"],
+                  ["Word to PDF", "/word-to-pdf"],
+                ].map(([label, href]) => (
+                  <li key={href}>
+                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">About</p>
+              <ul className="space-y-2">
+                <li><span className="text-xs text-muted-foreground">100% browser-based</span></li>
+                <li><span className="text-xs text-muted-foreground">No sign-up required</span></li>
+                <li><span className="text-xs text-muted-foreground">Files never uploaded</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border pt-4 text-center text-xs text-muted-foreground">
+            <p>Convertiqo — All conversions happen in your browser. No files are uploaded to any server.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
