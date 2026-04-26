@@ -283,64 +283,8 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6 bg-muted/10">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
-            <div>
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">Images</p>
-              <ul className="space-y-2">
-                {[
-                  ["Image Converter", "/image-converter"],
-                  ["JPG to PNG", "/jpg-to-png"],
-                  ["PNG to WebP", "/png-to-webp"],
-                  ["Compress Image", "/compress-image"],
-                ].map(([label, href]) => (
-                  <li key={href}>
-                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">Videos</p>
-              <ul className="space-y-2">
-                {[
-                  ["Video Converter", "/video-converter"],
-                  ["Compress Video", "/compress-video"],
-                ].map(([label, href]) => (
-                  <li key={href}>
-                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">PDF & Docs</p>
-              <ul className="space-y-2">
-                {[
-                  ["PDF Converter", "/pdf-converter"],
-                  ["PDF to Word", "/pdf-to-word"],
-                  ["Word to PDF", "/word-to-pdf"],
-                ].map(([label, href]) => (
-                  <li key={href}>
-                    <a href={href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-3">About</p>
-              <ul className="space-y-2">
-                <li><span className="text-xs text-muted-foreground">100% browser-based</span></li>
-                <li><span className="text-xs text-muted-foreground">No sign-up required</span></li>
-                <li><span className="text-xs text-muted-foreground">Files never uploaded</span></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border pt-4 text-center text-xs text-muted-foreground">
-            <p>Convertiqo — All conversions happen in your browser. No files are uploaded to any server.</p>
-          </div>
-        </div>
+      <footer className="border-t border-border py-4 px-6 text-center text-xs text-muted-foreground">
+        Convertiqo — All conversions happen in your browser. No files are ever uploaded to any server.
       </footer>
     </div>
   );

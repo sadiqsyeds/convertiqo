@@ -130,7 +130,7 @@ async function convertVideoToGif(
   };
 }
 
-// ─── Video → MP3 (audio extraction via Web Audio API) ────────────────────────
+// ─── Video → MP3 (real MP3 encoding via Web Audio API + lamejs) ──────────────
 
 async function convertVideoToMp3(
   item: QueueItem,
@@ -140,69 +140,88 @@ async function convertVideoToMp3(
   const settings = item.settings as VideoSettings;
   onProgress(5);
 
-  // Use MediaRecorder with audio/webm to capture audio stream
-  const url = URL.createObjectURL(item.file);
-  const video = document.createElement("video");
-  video.src = url;
-  video.muted = false;
-  video.preload = "metadata";
-
-  await new Promise<void>((resolve, reject) => {
-    video.onloadedmetadata = () => resolve();
-    video.onerror = () => reject(new Error("Failed to load video for audio extraction"));
-  });
-
-  const duration = video.duration;
-
-  // Capture audio via MediaElementAudioSourceNode + MediaStreamDestination
-  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-  const audioCtx = new AudioCtx();
-  const dest = audioCtx.createMediaStreamDestination();
-  const source = audioCtx.createMediaElementSource(video);
-  source.connect(dest);
-  source.connect(audioCtx.destination);
-
-  const audioMime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-    ? "audio/webm;codecs=opus"
-    : "audio/webm";
-
-  const chunks: Blob[] = [];
-  const recorder = new MediaRecorder(dest.stream, { mimeType: audioMime });
-
-  recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
-  const recordingDone = new Promise<void>((resolve, reject) => {
-    recorder.onstop = () => resolve();
-    recorder.onerror = () => reject(new Error("Audio recording error"));
-  });
-
+  // Step 1: Read the video file as an ArrayBuffer
+  const arrayBuffer = await item.file.arrayBuffer();
+  if (signal?.aborted) throw new Error("Cancelled");
   onProgress(10);
-  recorder.start(250);
-  video.play();
 
-  await new Promise<void>((resolve) => {
-    const startTime = performance.now();
-    const tick = () => {
-      if (signal?.aborted || video.ended) { resolve(); return; }
-      const elapsed = (performance.now() - startTime) / 1000;
-      onProgress(10 + Math.min(85, Math.round((elapsed / duration) * 85)));
-      requestAnimationFrame(tick);
-    };
-    video.onended = () => resolve();
-    requestAnimationFrame(tick);
-  });
-
-  recorder.stop();
-  await recordingDone;
-  await audioCtx.close();
-  URL.revokeObjectURL(url);
+  // Step 2: Decode audio using Web Audio API (OfflineAudioContext)
+  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const tempCtx = new AudioCtx();
+  let audioBuffer: AudioBuffer;
+  try {
+    audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
+  } catch {
+    await tempCtx.close();
+    throw new Error("Could not decode audio from this video file. The video may have no audio track.");
+  }
+  await tempCtx.close();
 
   if (signal?.aborted) throw new Error("Cancelled");
-  onProgress(98);
+  onProgress(30);
 
-  // Output as webm audio (browsers can't encode native MP3 without codec)
-  // The file is labeled .mp3 but is actually WebM audio — widely playable
-  const blob = new Blob(chunks, { type: audioMime });
+  // Step 3: Encode to MP3 using lamejs loaded via /public/lame.all.js
+  // (bypasses all bundler CommonJS/MPEGMode issues)
+  const Mp3Encoder = await import("@/lib/mp3-encoder").then((m) => m.getMp3Encoder());
+
+  const numChannels = Math.min(audioBuffer.numberOfChannels, 2);
+  const sampleRate = audioBuffer.sampleRate;
+  const kbps = 128; // Standard MP3 quality
+
+  const encoder = new Mp3Encoder(numChannels, sampleRate, kbps);
+  const mp3Data: Int8Array[] = [];
+
+  // Get PCM data from audio buffer channels
+  const leftChannel = audioBuffer.getChannelData(0);
+  const rightChannel = numChannels > 1 ? audioBuffer.getChannelData(1) : leftChannel;
+
+  const totalSamples = leftChannel.length;
+  const chunkSize = 1152; // lamejs processes frames of 1152 samples
+
+  // Convert Float32 PCM to Int16 PCM (lamejs expects Int16Array)
+  const floatToInt16 = (float32: Float32Array, start: number, end: number): Int16Array => {
+    const int16 = new Int16Array(end - start);
+    for (let i = start; i < end; i++) {
+      const s = Math.max(-1, Math.min(1, float32[i]));
+      int16[i - start] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    return int16;
+  };
+
+  for (let i = 0; i < totalSamples; i += chunkSize) {
+    if (signal?.aborted) throw new Error("Cancelled");
+
+    const end = Math.min(i + chunkSize, totalSamples);
+    const leftChunk = floatToInt16(leftChannel, i, end);
+    const rightChunk = numChannels > 1 ? floatToInt16(rightChannel, i, end) : leftChunk;
+
+    const encoded = numChannels === 2
+      ? encoder.encodeBuffer(leftChunk, rightChunk)
+      : encoder.encodeBuffer(leftChunk);
+
+    if (encoded.length > 0) mp3Data.push(encoded);
+
+    // Update progress from 30% to 90%
+    onProgress(30 + Math.round((i / totalSamples) * 60));
+  }
+
+  // Flush remaining MP3 frames
+  const flushed = encoder.flush();
+  if (flushed.length > 0) mp3Data.push(flushed);
+
+  if (signal?.aborted) throw new Error("Cancelled");
+  onProgress(95);
+
+  // Combine all MP3 chunks into a single Blob
+  const totalLength = mp3Data.reduce((acc, chunk) => acc + chunk.length, 0);
+  const mp3Buffer = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of mp3Data) {
+    mp3Buffer.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  const blob = new Blob([mp3Buffer], { type: "audio/mpeg" });
   onProgress(100);
 
   const baseName = item.name.replace(/\.[^.]+$/, "");
@@ -210,7 +229,7 @@ async function convertVideoToMp3(
     blob,
     filename: settings.outputName || `${baseName}.mp3`,
     outputSize: blob.size,
-    mimeType: audioMime,
+    mimeType: "audio/mpeg",
     convertedAt: Date.now(),
   };
 }

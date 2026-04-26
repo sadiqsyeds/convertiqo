@@ -5,25 +5,26 @@
 /* ─── CSS Custom Properties (overridable by .dark) ───────────────────────── */
 
 :root {
-  --background: oklch(0.99 0 0);
+  /* Soft warm off-white — easier on eyes than pure white */
+  --background: oklch(0.97 0.004 75);
   --foreground: oklch(0.14 0.01 260);
-  --card: oklch(1 0 0);
+  --card: oklch(0.985 0.003 75);
   --card-foreground: oklch(0.14 0.01 260);
-  --border: oklch(0.92 0.005 260);
-  --input: oklch(0.92 0.005 260);
+  --border: oklch(0.90 0.006 75);
+  --input: oklch(0.90 0.006 75);
   --ring: oklch(0.55 0.2 260);
 
   --primary: oklch(0.45 0.2 260);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.005 260);
+  --primary-foreground: oklch(0.985 0.003 75);
+  --secondary: oklch(0.94 0.006 75);
   --secondary-foreground: oklch(0.25 0.02 260);
-  --muted: oklch(0.97 0.005 260);
-  --muted-foreground: oklch(0.55 0.02 260);
-  --accent: oklch(0.96 0.005 260);
+  --muted: oklch(0.95 0.005 75);
+  --muted-foreground: oklch(0.52 0.02 260);
+  --accent: oklch(0.94 0.006 75);
   --accent-foreground: oklch(0.25 0.02 260);
   --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --popover: oklch(1 0 0);
+  --destructive-foreground: oklch(0.985 0.003 75);
+  --popover: oklch(0.985 0.003 75);
   --popover-foreground: oklch(0.14 0.01 260);
 
   --radius: 0.75rem;

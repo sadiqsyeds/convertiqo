@@ -12,7 +12,7 @@ const faqs = [
   { q: "Are my videos uploaded to a server?", a: "No. Video conversion uses your browser's MediaRecorder API. Everything stays on your device." },
   { q: "Why does video conversion take time?", a: "Video is re-encoded in real-time at 1× playback speed. A 60-second video takes approximately 60 seconds to convert." },
   { q: "Can I convert video to GIF?", a: "Yes. Convertino can extract frames from short video clips (up to 30 seconds) and encode them as animated GIF." },
-  { q: "Can I extract audio from a video?", a: "Yes. Select MP3 as the output format to extract the audio track from any video." },
+  { q: "Can I extract audio from a video?", a: "Yes. Select MP3 as the output format to extract the audio track. The converter uses the Web Audio API to decode and re-encode the audio as a real MP3 file (128 kbps), playable on any device or media player." },
   { q: "What quality setting should I use for video?", a: "For a good balance of quality and file size, use 70–80%. Higher values produce larger files with better quality." },
 ];
 
@@ -21,7 +21,7 @@ export default function VideoConverterPage() {
     <ToolPageLayout
       slug="video-converter"
       h1={page.h1}
-      description="Convert MP4, WebM, MOV, AVI, and MKV videos online for free. Extract audio as MP3 or create animated GIFs. No upload, no account, no watermarks."
+      description="Convert MP4, WebM, MOV, AVI, and MKV videos online for free. Extract audio or create animated GIFs. No upload, no account, no watermarks."
       faqItems={faqs}
       ctaTitle="Convert your video now"
       ctaDescription="Upload any video file and convert it to your preferred format instantly in your browser."
@@ -35,7 +35,7 @@ export default function VideoConverterPage() {
             { from: "MOV", to: "MP4", desc: "Convert Apple QuickTime MOV files to universal MP4 format." },
             { from: "AVI", to: "MP4", desc: "Modernize old AVI files to compact, universally-supported MP4." },
             { from: "Video", to: "GIF", desc: "Turn short clips (up to 30s) into shareable animated GIFs." },
-            { from: "Video", to: "MP3", desc: "Extract audio from any video file as a high-quality audio file." },
+            { from: "Video", to: "MP3", desc: "Extract audio from any video as a real MP3 file (128 kbps). Plays on any device." },
           ].map((c) => (
             <div key={c.from + c.to} className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center gap-2 mb-2">

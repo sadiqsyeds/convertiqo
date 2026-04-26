@@ -135,7 +135,7 @@ export const VIDEO_OUTPUT_FORMATS: FormatOption[] = [
   { format: "avi", label: "AVI", description: "Windows video format" },
   { format: "mkv", label: "MKV", description: "Matroska container" },
   { format: "gif", label: "GIF", description: "Animated (short clips)" },
-  { format: "mp3", label: "MP3", description: "Extract audio only" },
+  { format: "mp3", label: "MP3", description: "Extract audio as MP3" },
 ];
 
 export const PDF_OUTPUT_FORMATS: FormatOption[] = [
