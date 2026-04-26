@@ -69,8 +69,8 @@ Convertiqois a production-ready Next.js application that lets users convert imag
 ### Installation
 
 ```bash
-git clone https://github.com/yourname/fileforge.git
-cd fileforge
+git clone https://github.com/yourname/convertiqo.git
+cd convertiqo
 npm install
 ```
 

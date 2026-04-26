@@ -55,5 +55,5 @@ export async function downloadAllAsZip(items: QueueItem[]): Promise<void> {
   }
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
-  downloadBlob(zipBlob, "fileforge_results.zip");
+  downloadBlob(zipBlob, "convertiqo_results.zip");
 }

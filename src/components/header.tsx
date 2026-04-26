@@ -7,12 +7,16 @@ import { useMounted } from "@/hooks/useMounted";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const mounted = useMounted();
+
+  // Render neutral (no active state) until mounted to avoid hydration mismatch
+  const activeTheme = mounted ? theme : undefined;
 
   return (
     <div className="flex items-center rounded-lg border border-border bg-background p-0.5 gap-0.5">
       <button
         onClick={() => setTheme("light")}
-        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${theme === "light" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${activeTheme === "light" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         title="Light mode"
         aria-label="Switch to light mode"
       >
@@ -20,7 +24,7 @@ function ThemeToggle() {
       </button>
       <button
         onClick={() => setTheme("system")}
-        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${theme === "system" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${activeTheme === "system" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         title="System mode"
         aria-label="Use system theme"
       >
@@ -28,7 +32,7 @@ function ThemeToggle() {
       </button>
       <button
         onClick={() => setTheme("dark")}
-        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${theme === "dark" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        className={`flex h-6 w-6 items-center justify-center rounded-md transition-colors ${activeTheme === "dark" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         title="Dark mode"
         aria-label="Switch to dark mode"
       >

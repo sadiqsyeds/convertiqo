@@ -222,5 +222,5 @@ export const CATEGORY_ICON: Record<FileCategory, string> = {
 
 // ─── Local Storage Keys ───────────────────────────────────────────────────────
 
-export const HISTORY_STORAGE_KEY = "fileforge_history";
-export const SETTINGS_STORAGE_KEY = "fileforge_settings";
+export const HISTORY_STORAGE_KEY = "convertiqo_history";
+export const SETTINGS_STORAGE_KEY = "convertiqo_settings";
