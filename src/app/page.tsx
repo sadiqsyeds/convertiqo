@@ -136,7 +136,7 @@ export default function HomePage() {
               {hasMultiSelection && (
                 <>
                   <div className="h-4 w-px bg-border shrink-0" />
-                  {/* Bulk format chips */}
+                  {/* Bulk format chips — takes all available space */}
                   <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                     <span className="text-xs text-muted-foreground self-center shrink-0">Format:</span>
                     {bulkFormats.map((format) => {
@@ -146,7 +146,7 @@ export default function HomePage() {
                           key={format}
                           onClick={() => bulkUpdateFormat(format as ConversionFormat)}
                           className={cn(
-                            "rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wide transition-all",
+                            "rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide transition-all",
                             "hover:ring-2 hover:ring-primary hover:ring-offset-1 focus-visible:outline-none",
                             colorClass
                           )}
@@ -157,40 +157,40 @@ export default function HomePage() {
                       );
                     })}
                   </div>
-                  {/* Quality toggle */}
-                  <button
-                    onClick={() => setShowBulkQuality((p) => !p)}
-                    className={cn(
-                      "flex items-center gap-1 text-xs transition-colors shrink-0",
-                      showBulkQuality ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <SlidersHorizontal className="h-3 w-3" />
-                    Quality
-                  </button>
-                  <div className="h-4 w-px bg-border shrink-0" />
-                  {/* Bulk remove */}
-                  <button
-                    onClick={bulkRemove}
-                    className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 transition-colors shrink-0"
-                    title="Remove selected"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                    Remove
-                  </button>
-                  {/* Clear selection */}
-                  <button
-                    onClick={clearSelection}
-                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                    title="Clear selection"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+                  {/* Quality + Remove + Clear — pushed to the right */}
+                  <div className="flex items-center gap-2 shrink-0 ml-auto">
+                    <button
+                      onClick={() => setShowBulkQuality((p) => !p)}
+                      className={cn(
+                        "flex items-center gap-1 text-xs transition-colors",
+                        showBulkQuality ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <SlidersHorizontal className="h-3 w-3" />
+                      Quality
+                    </button>
+                    <div className="h-4 w-px bg-border" />
+                    <button
+                      onClick={bulkRemove}
+                      className="flex items-center gap-1 text-xs text-destructive hover:text-destructive/80 transition-colors"
+                      title="Remove selected"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Remove
+                    </button>
+                    <button
+                      onClick={clearSelection}
+                      className="text-muted-foreground hover:text-foreground transition-colors p-0.5"
+                      title="Clear selection"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </>
               )}
 
-              {/* Spacer */}
-              <div className="flex-1" />
+              {/* No selection: spacer before file count */}
+              {!hasMultiSelection && <div className="flex-1" />}
 
               {/* File count */}
               <span className="text-sm font-medium text-foreground shrink-0">

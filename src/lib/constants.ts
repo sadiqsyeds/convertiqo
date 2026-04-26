@@ -125,6 +125,7 @@ export const IMAGE_OUTPUT_FORMATS: FormatOption[] = [
   { format: "gif", label: "GIF", description: "Animated images" },
   { format: "bmp", label: "BMP", description: "Uncompressed bitmap" },
   { format: "tiff", label: "TIFF", description: "High quality print" },
+  { format: "pdf", label: "PDF", description: "Convert image to PDF" },
 ];
 
 export const VIDEO_OUTPUT_FORMATS: FormatOption[] = [
@@ -171,10 +172,9 @@ export function getDefaultFormat(
 
   switch (category) {
     case "image":
-      // Default to webp for most, jpg if source is svg
-      if (currentExt === "svg") return "png";
-      const webp = formats.find((f) => f.format === "webp");
-      return webp ? "webp" : formats[0].format;
+      // Default to PNG for all image types
+      const png = formats.find((f) => f.format === "png");
+      return png ? "png" : formats[0].format;
     case "video":
       const mp4 = formats.find((f) => f.format === "mp4");
       return mp4 ? "mp4" : formats[0].format;
