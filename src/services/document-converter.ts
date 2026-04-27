@@ -42,7 +42,7 @@ async function convertDocxToPdf(
   if (signal?.aborted) throw new Error("Cancelled");
   onProgress(40);
 
-  // 3. Create a hidden iframe to render the HTML so we can measure it
+  // 3. Create a hidden div to render the HTML so we can measure it
   const container = document.createElement("div");
   container.style.cssText = [
     "position:fixed", "left:-9999px", "top:0",
@@ -60,6 +60,10 @@ async function convertDocxToPdf(
   onProgress(55);
 
   // 4. Render container to canvas using html2canvas
+  //    html2canvas v1.x does not support modern CSS color functions (oklch, lab, oklab, lch, etc.)
+  //    that Tailwind v4 uses extensively in its CSS custom properties.
+  //    We inject a <style> override in the onclone callback that resets every CSS custom property
+  //    used by Tailwind/globals.css to plain hex/rgb values so html2canvas never sees them.
   const html2canvas = (await import("html2canvas")).default;
   const canvas = await html2canvas(container, {
     scale: 1.5,
@@ -67,6 +71,46 @@ async function convertDocxToPdf(
     logging: false,
     backgroundColor: "#ffffff",
     windowWidth: 794,
+    onclone: (clonedDoc: Document) => {
+      // Inject a stylesheet that overrides all oklch/lab CSS custom properties with safe values.
+      // This prevents html2canvas from encountering unsupported color functions when it reads
+      // computed styles from any element in the cloned document.
+      const style = clonedDoc.createElement("style");
+      style.textContent = `
+        *, *::before, *::after {
+          --background: #f7f5f2 !important;
+          --foreground: #111111 !important;
+          --card: #fafaf8 !important;
+          --card-foreground: #111111 !important;
+          --border: #e2ddd8 !important;
+          --input: #e2ddd8 !important;
+          --ring: #4a5bb5 !important;
+          --primary: #3a4a9e !important;
+          --primary-foreground: #fafaf8 !important;
+          --secondary: #eeebe6 !important;
+          --secondary-foreground: #222233 !important;
+          --muted: #f0ede8 !important;
+          --muted-foreground: #666677 !important;
+          --accent: #eeebe6 !important;
+          --accent-foreground: #222233 !important;
+          --destructive: #c0392b !important;
+          --destructive-foreground: #fafaf8 !important;
+          --popover: #fafaf8 !important;
+          --popover-foreground: #111111 !important;
+        }
+      `;
+      clonedDoc.head.appendChild(style);
+
+      // Also explicitly reset the container element itself
+      const clonedContainer = clonedDoc.body.firstElementChild as HTMLElement | null;
+      if (clonedContainer) {
+        clonedContainer.style.background = "#ffffff";
+        clonedContainer.style.color = "#000000";
+        clonedContainer.style.fontFamily = "Arial, sans-serif";
+        clonedContainer.style.fontSize = "12pt";
+        clonedContainer.style.lineHeight = "1.5";
+      }
+    },
   });
   document.body.removeChild(container);
 

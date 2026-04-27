@@ -105,7 +105,6 @@ export function FileCard({ item }: { item: QueueItem }) {
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          {isDone && <Button size="icon-sm" variant="ghost" onClick={() => downloadItem(item)} title="Download" className="text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"><Download className="h-3.5 w-3.5" /></Button>}
           {isError && <Button size="icon-sm" variant="ghost" onClick={() => retryItem(item.id)} title="Retry"><RefreshCw className="h-3.5 w-3.5" /></Button>}
           {isProcessing && <Button size="icon-sm" variant="ghost" onClick={() => cancelItem(item.id)} title="Cancel"><Ban className="h-3.5 w-3.5" /></Button>}
           {!isProcessing && <Button size="icon-sm" variant="ghost" onClick={() => removeItem(item.id)} title="Remove" className="opacity-0 group-hover:opacity-100 transition-opacity"><X className="h-3.5 w-3.5" /></Button>}
